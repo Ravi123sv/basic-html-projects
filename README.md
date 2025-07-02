@@ -1,4 +1,3 @@
-```markdown
 # Basic HTML Projects
 
 This repository contains a collection of very basic HTML-only projects created for learning and practice. Each project is simple, self-contained, and built using only HTML (some with inline CSS and JS).
