@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Four</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f7f3e9;
+            transition: background-color 0.5s ease;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        #gameMode {
+            margin-bottom: 15px;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            border: 5px solid #ffa500;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fffacd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #d3d3d3;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .cell:hover {
+            background-color: #b3b3b3;
+            transform: scale(1.1);
+        }
+
+        .red {
+            background-color: red;
+            animation: drop 0.5s ease forwards;
+        }
+
+        .yellow {
+            background-color: yellow;
+            animation: drop 0.5s ease forwards;
+        }
+
+        @keyframes drop {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #status {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        #restart {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        #restart:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Celebration animation */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: green;
+            font-size: 3rem;
+            animation: fadeOut 2s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Connect Four</h1>
+    <div id="gameMode">
+        <label>Select Game Mode:</label>
+        <select id="modeSelect">
+            <option value="pvp">Player vs Player</option>
+            <option value="bot">Player vs Bot</option>
+        </select>
+    </div>
+    <div id="status">Player 1's turn (Red)</div>
+    <div id="board"></div>
+    <button id="restart">Restart Game</button>
+
+    <script>
+        const board = document.getElementById('board');
+        const statusDiv = document.getElementById('status');
+        const restartButton = document.getElementById('restart');
+        const modeSelect = document.getElementById('modeSelect');
+        const rows = 6;
+        const cols = 7;
+        let currentPlayer = 'red';
+        let gameBoard = Array.from({ length: rows }, () => Array(cols).fill(null));
+        let gameOver = false;
+        let gameMode = 'pvp'; // default mode is Player vs Player
+
+        modeSelect.addEventListener('change', (e) => {
+            gameMode = e.target.value;
+            restartGame(); // Restart game on mode change
+        });
+
+        function createBoard() {
+            board.innerHTML = ''; // Clear previous board
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.column = c;
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(event) {
+            if (gameOver) return;
+            const column = event.target.dataset.column;
+            const row = findEmptyRow(column);
+            if (row === null) return;
+
+            gameBoard[row][column] = currentPlayer;
+            const cell = board.children[row * cols + parseInt(column)];
+            cell.classList.add(currentPlayer);
+
+            if (checkWin(row, column)) {
+                statusDiv.textContent = `${capitalize(currentPlayer)} wins!`;
+                showCelebration();
+                gameOver = true;
+                return;
+            }
+
+            if (gameBoard.flat().every(cell => cell !== null)) {
+                statusDiv.textContent = "It's a draw!";
+                gameOver = true;
+                return;
+            }
+
+            if (gameMode === 'pvp') {
+                switchPlayer();
+            } else if (gameMode === 'bot') {
+                switchPlayer();
+                setTimeout(botMove, 500); // Add a slight delay for bot move
+            }
+        }
+
+        function botMove() {
+            if (gameOver) return;
+            let column;
+            do {
+                column = Math.floor(Math.random() * cols);
+            } while (findEmptyRow(column) === null);
+
+            const row = findEmptyRow(column);
+            gameBoard[row][column] = currentPlayer;
+            const cell = board.children[row * cols + column];
+            cell.classList.add(currentPlayer);
+
+            if (checkWin(row, column)) {
+                statusDiv.textContent = `${capitalize(currentPlayer)} wins!`;
+                showCelebration();
+                gameOver = true;
+                return;
+            }
+
+            if (gameBoard.flat().every(cell => cell !== null)) {
+                statusDiv.textContent = "It's a draw!";
+                gameOver = true;
+            } else {
+                switchPlayer();
+            }
+        }
+
+        function switchPlayer() {
+            currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
+            statusDiv.textContent = `${capitalize(currentPlayer)}'s turn`;
+        }
+
+        function findEmptyRow(column) {
+            for (let r = rows - 1; r >= 0; r--) {
+                if (!gameBoard[r][column]) {
+                    return r;
+                }
+            }
+            return null;
+        }
+
+        function checkWin(row, column) {
+            return (
+                checkDirection(row, column, 1, 0) ||  // Horizontal
+                checkDirection(row, column, 0, 1) ||  // Vertical
+                checkDirection(row, column, 1, 1) ||  // Diagonal \
+                checkDirection(row, column, 1, -1)    // Diagonal /
+            );
+        }
+
+        function checkDirection(row, column, rowIncrement, colIncrement) {
+            let count = 1;
+            count += countPieces(row, column, rowIncrement, colIncrement);
+            count += countPieces(row, column, -rowIncrement, -colIncrement);
+            return count >= 4;
+        }
+
+        function countPieces(row, column, rowIncrement, colIncrement) {
+            let count = 0;
+            let r = row + rowIncrement;
+            let c = parseInt(column) + colIncrement;
+            while (r >= 0 && r < rows && c >= 0 && c < cols && gameBoard[r][c] === currentPlayer) {
+                count++;
+                r += rowIncrement;
+                c += colIncrement;
+            }
+            return count;
+        }
+
+        function restartGame() {
+            gameBoard = Array.from({ length: rows }, () => Array(cols).fill(null));
+            currentPlayer = 'red';
+            gameOver = false;
+            statusDiv.textContent = "Player 1's turn (Red)";
+            createBoard();
+        }
+
+        function capitalize(color) {
+            return color.charAt(0).toUpperCase() + color.slice(1);
+        }
+
+        function showCelebration() {
+            const celebrationDiv = document.createElement('div');
+            celebrationDiv.className = 'celebration';
+            celebrationDiv.textContent = `${capitalize(currentPlayer)} Wins! 🎉`;
+            document.body.appendChild(celebrationDiv);
+            setTimeout(() => {
+                celebrationDiv.remove();
+            }, 2000);
+        }
+
+        board.addEventListener('click', handleCellClick);
+        restartButton.addEventListener('click', restartGame);
+
+        createBoard(); // Initialize the board
+    </script>
+</body>
+</html>

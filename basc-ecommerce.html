@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced E-Commerce Webpage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s ease;
+        }
+        header {
+            background: #35424a;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .navbar button {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .navbar button:hover {
+            background: #c7371a;
+        }
+        .search-container {
+            text-align: center;
+            margin: 20px;
+        }
+        .search-container input {
+            padding: 10px;
+            width: 200px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        .product {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .product:hover {
+            transform: scale(1.05);
+        }
+        .product img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .product button {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-top: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .product button:hover {
+            background: #c7371a;
+        }
+        .cart {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #35424a;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            transition: opacity 0.3s;
+        }
+        .cart.active {
+            display: block;
+            opacity: 1;
+        }
+        .cart-item {
+            border-bottom: 1px solid #ddd;
+            padding: 5px 0;
+        }
+        .checkout-button {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: block;
+            margin-top: 10px;
+        }
+        .checkout-button:hover {
+            background: #c7371a;
+        }
+        .game-section {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            margin: 20px;
+            border-radius: 5px;
+        }
+        .game-section.active {
+            display: block;
+        }
+        .game-section button {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: block;
+            margin: 10px 0;
+        }
+        .game-section button:hover {
+            background: #c7371a;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Advanced E-Commerce Webpage</h1>
+    <div class="navbar">
+        <button onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</button>
+        <button onclick="toggleGames()">Games</button>
+    </div>
+</header>
+
+<div class="search-container">
+    <input type="text" id="search-bar" placeholder="Search products..." onkeyup="filterProducts()">
+</div>
+
+<div class="products" id="product-list">
+    <!-- Product Cards -->
+    <div class="product" data-name="Dress 1" data-price="1000">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Dress+1" alt="Dress 1">
+        <h3>Dress 1</h3>
+        <p>₹1000</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Dress 2" data-price="1200">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Dress+2" alt="Dress 2">
+        <h3>Dress 2</h3>
+        <p>₹1200</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Jogger 1" data-price="1500">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Jogger+1" alt="Jogger 1">
+        <h3>Jogger 1</h3>
+        <p>₹1500</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Jogger 2" data-price="1300">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Jogger+2" alt="Jogger 2">
+        <h3>Jogger 2</h3>
+        <p>₹1300</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Shirt 1" data-price="900">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Shirt+1" alt="Shirt 1">
+        <h3>Shirt 1</h3>
+        <p>₹900</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Shirt 2" data-price="950">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Shirt+2" alt="Shirt 2">
+        <h3>Shirt 2</h3>
+        <p>₹950</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Pants 1" data-price="1200">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Pants+1" alt="Pants 1">
+        <h3>Pants 1</h3>
+        <p>₹1200</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Pants 2" data-price="1250">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Pants+2" alt="Pants 2">
+        <h3>Pants 2</h3>
+        <p>₹1250</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Shoes 1" data-price="2500">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Shoes+1" alt="Shoes 1">
+        <h3>Shoes 1</h3>
+        <p>₹2500</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+    <div class="product" data-name="Shoes 2" data-price="2600">
+        <img src="https://via.placeholder.com/200x150/ff9999/ffffff?text=Shoes+2" alt="Shoes 2">
+        <h3>Shoes 2</h3>
+        <p>₹2600</p>
+        <button onclick="showProductDetails(this)">View Details</button>
+    </div>
+</div>
+
+<!-- Cart Section -->
+<div class="cart" id="cart">
+    <h3>Your Cart</h3>
+    <div id="cart-items"></div>
+    <button class="checkout-button" onclick="checkout()">Proceed to Checkout</button>
+</div>
+
+<!-- Game Section -->
+<div class="game-section" id="game-section">
+    <h2>Mini Games</h2>
+    <button onclick="startGame()">Play a Game</button>
+    <button onclick="toggleGames()">Close</button>
+</div>
+
+<script>
+    let cart = [];
+    let productDetails = "";
+
+    function showProductDetails(button) {
+        const product = button.parentElement;
+        const productName = product.getAttribute('data-name');
+        const productPrice = product.getAttribute('data-price');
+        const productInfo = `Product: ${productName}\nPrice: ₹${productPrice}`;
+        alert(productInfo);
+        
+        const cartItem = {
+            name: productName,
+            price: productPrice
+        };
+        cart.push(cartItem);
+        updateCart();
+    }
+
+    function updateCart() {
+        const cartItemsDiv = document.getElementById('cart-items');
+        cartItemsDiv.innerHTML = '';
+        cart.forEach(item => {
+            cartItemsDiv.innerHTML += `<div class="cart-item">${item.name} - ₹${item.price}</div>`;
+        });
+        document.getElementById('cart-count').innerText = cart.length;
+        const cartElement = document.getElementById('cart');
+        cartElement.classList.add('active');
+    }
+
+    function toggleCart() {
+        const cartElement = document.getElementById('cart');
+        cartElement.classList.toggle('active');
+    }
+
+    function filterProducts() {
+        const searchInput = document.getElementById('search-bar').value.toLowerCase();
+        const products = document.querySelectorAll('.product');
+        products.forEach(product => {
+            const productName = product.getAttribute('data-name').toLowerCase();
+            product.style.display = productName.includes(searchInput) ? 'block' : 'none';
+        });
+    }
+
+    function toggleGames() {
+        const gameSection = document.getElementById('game-section');
+        gameSection.classList.toggle('active');
+    }
+
+    function startGame() {
+        alert("Game started!"); // Placeholder for game functionality
+    }
+
+    function checkout() {
+        alert("Proceeding to checkout. Please enter your address and payment details.");
+        // Here you can add a form for user details and payment processing.
+    }
+</script>
+
+</body>
+</html>
